@@ -14,12 +14,6 @@ type Container struct {
 	lifecycles []Lifecycle                   // 生命周期对象列表
 }
 
-// Lifecycle 定义可被统一启动/销毁的模块
-type Lifecycle interface {
-	Start() error
-	Stop() error
-}
-
 // New 创建一个新的容器实例
 func New() *Container {
 	return &Container{
