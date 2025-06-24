@@ -1,4 +1,4 @@
-为了让大家可以快速将 [go-ioc-framework](https://gitee.com/jay-kim/go-ioc-framework) 项目引入并实现完整的 IOC 统一管理，我可以提供一份**标准使用指南（集成步骤）**。下面是完整详细的说明流程，包括：
+为了让大家可以快速将 [go-ioc-framework](https://github.com/jay-kim/go-ioc-framework) 项目引入并实现完整的 IOC 统一管理，我可以提供一份**标准使用指南（集成步骤）**。下面是完整详细的说明流程，包括：
 
 ------
 
@@ -7,7 +7,7 @@
 ### 使用 Go Modules：
 
 ```bash
-go get gitee.com/jay-kim/go-ioc-framework
+go get github.com/jay-kim/go-ioc-framework
 ```
 
 或者，如果是 GitHub 镜像路径（如有同步）：
@@ -21,7 +21,7 @@ go get github.com/jay-kim/go-ioc-framework
 ## ✅ 第二步：初始化容器并注册服务
 
 ```go
-import "gitee.com/jay-kim/go-ioc-framework/container"
+import "github.com/jay-kim/go-ioc-framework/container"
 
 // 初始化容器
 var c = container.New()
