@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "gitee.com/jay-kim/go-ioc-framework/internal/user"
+	_ "gitee.com/jay-kim/go-ioc-framework/examples/demon/user"
 	"gitee.com/jay-kim/go-ioc-framework/pkg/ioc"
 	"go.uber.org/zap"
 )
