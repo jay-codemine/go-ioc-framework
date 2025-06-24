@@ -11,5 +11,5 @@ func PingHandler(ctx *gin.Context, c *ioc.Container) {
 	c.Get(&logger)
 
 	logger.Info("received ping")
-	ctx.JSON(200, gin.H{"msg": "Hello from IOC"})
+	ctx.JSON(200, gin.H{"msg": "pong"})
 }

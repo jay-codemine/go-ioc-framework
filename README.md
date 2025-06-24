@@ -1,43 +1,134 @@
-# go-ioc
+为了让大家可以快速将 [go-ioc-framework](https://gitee.com/jay-kim/go-ioc-framework) 项目引入并实现完整的 IOC 统一管理，我可以提供一份**标准使用指南（集成步骤）**。下面是完整详细的说明流程，包括：
 
-#### 介绍
-# go-ioc
+------
 
-🚀 A lightweight, extensible IOC (Inversion of Control) framework for Go, designed for modern modular applications.  
-支持服务注册、自动依赖注入、Gin/gRPC 自动注册、生命周期管理，开箱即用。
+## ✅ 第一步：引入框架
 
-适合构建高内聚、模块化、可维护的微服务或 CLI 项目。
+### 使用 Go Modules：
 
+```bash
+go get gitee.com/jay-kim/go-ioc-framework
+```
 
-#### 软件架构
-软件架构说明
+或者，如果是 GitHub 镜像路径（如有同步）：
 
+```bash
+go get github.com/jay-kim/go-ioc-framework
+```
 
-#### 安装教程
+------
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## ✅ 第二步：初始化容器并注册服务
 
-#### 使用说明
+```go
+import "gitee.com/jay-kim/go-ioc-framework/container"
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+// 初始化容器
+var c = container.New()
 
-#### 参与贡献
+// 注册一个构造函数（必须是无参构造函数）
+c.Provide("main.UserService", func() interface{} {
+    return &UserService{}
+})
+```
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+------
 
+## ✅ 第三步：获取服务实例（自动注入）
 
-#### 特技
+```go
+var userSvc *UserService
+c.Get(&userSvc)
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+userSvc.Hello() // 使用服务方法
+```
+
+🔍 框架内部通过反射将实例注入到 `*userSvc` 中。
+
+------
+
+## ✅ 第四步（可选）：统一生命周期管理
+
+如服务实现：
+
+```go
+type Lifecycle interface {
+	Start() error
+	Stop() error
+}
+```
+
+容器将自动注册它，并可以统一管理：
+
+```go
+c.InitAll() // 启动所有服务
+c.StopAll() // 停止所有服务
+```
+
+------
+
+## ✅ 第五步：在项目中统一管理模块
+
+你可以把每个模块拆成如下结构：
+
+```go
+internal/
+  ├─ user/
+  │   ├─ service.go      // 核心逻辑
+  │   └─ api.go          // Gin 路由（或 gRPC handler）
+  ├─ logger/
+  │   └─ logger.go       // zap 封装
+  └─ db/
+      └─ mysql.go        // DB连接（带生命周期）
+```
+
+在 `main.go` 中注册所有模块：
+
+```go
+c.Provide("logger.Logger", func() interface{} {
+	return logger.NewLogger()
+})
+c.Provide("user.UserService", func() interface{} {
+	return &user.UserService{}
+})
+```
+
+然后统一启动：
+
+```go
+c.InitAll()
+
+defer c.StopAll()
+```
+
+------
+
+## ✅ 第六步：适配 Gin / gRPC 框架
+
+- Gin 路由挂载时：
+
+```go
+var userApi *UserApi
+c.Get(&userApi)
+userApi.RegisterRoutes(router)
+```
+
+- gRPC 注册服务时：
+
+```go
+var grpcSvc *GrpcUserService
+c.Get(&grpcSvc)
+grpcSvc.Register(grpcServer)
+```
+
+------
+
+## 📌 总结：完整 IOC 统一管理的核心理念
+
+| 步骤         | 说明                                            |
+| ------------ | ----------------------------------------------- |
+| 容器初始化   | 通过 `container.New()` 创建                     |
+| 模块注册     | `Provide(name, constructor)` 注册所有模块       |
+| 实例注入     | `Get(&ptr)` 获取实例并注入                      |
+| 生命周期管理 | 实现 `Lifecycle` 接口统一管理 Start/Stop        |
+| 框架适配     | 兼容 Gin / gRPC / zap / db 等模块统一注册与管理 |
